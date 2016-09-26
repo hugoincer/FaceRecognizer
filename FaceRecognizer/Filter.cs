@@ -169,27 +169,21 @@ namespace FaceRecognizer
                                                       ImageLockMode.ReadOnly,
                                                 PixelFormat.Format32bppArgb);
 
-
             byte[] pixelBuffer = new byte[sourceData.Stride * sourceData.Height];
             byte[] resultBuffer = new byte[sourceData.Stride * sourceData.Height];
 
-
             Marshal.Copy(sourceData.Scan0, pixelBuffer, 0, pixelBuffer.Length);
             sourceBitmap.UnlockBits(sourceData);
-
 
             double blue = 0.0;
             double green = 0.0;
             double red = 0.0;
 
-
             int filterWidth = filterMatrix.GetLength(1);
             int filterHeight = filterMatrix.GetLength(0);
 
-
             int filterOffset = (filterWidth - 1) / 2;
             int calcOffset = 0;
-
 
             int byteOffset = 0;
 
@@ -204,11 +198,7 @@ namespace FaceRecognizer
                     green = 0;
                     red = 0;
 
-
-                    byteOffset = offsetY *
-                                 sourceData.Stride +
-                                 offsetX * 4;
-
+                    byteOffset = offsetY * sourceData.Stride + offsetX * 4;
 
                     for (int filterY = -filterOffset;
                         filterY <= filterOffset; filterY++)
@@ -216,26 +206,16 @@ namespace FaceRecognizer
                         for (int filterX = -filterOffset;
                             filterX <= filterOffset; filterX++)
                         {
-
-
-                            calcOffset = byteOffset +
-                                         (filterX * 4) +
-                                         (filterY * sourceData.Stride);
-
+                            calcOffset = byteOffset + (filterX * 4) + (filterY * sourceData.Stride);
 
                             blue += (double)(pixelBuffer[calcOffset]) *
-                                    filterMatrix[filterY + filterOffset,
-                                                        filterX + filterOffset];
-
+                                    filterMatrix[filterY + filterOffset,filterX + filterOffset];
 
                             green += (double)(pixelBuffer[calcOffset + 1]) *
-                                     filterMatrix[filterY + filterOffset,
-                                                        filterX + filterOffset];
-
+                                     filterMatrix[filterY + filterOffset, filterX + filterOffset];
 
                             red += (double)(pixelBuffer[calcOffset + 2]) *
-                                   filterMatrix[filterY + filterOffset,
-                                                      filterX + filterOffset];
+                                   filterMatrix[filterY + filterOffset, filterX + filterOffset];
                         }
                     }
 
@@ -247,10 +227,9 @@ namespace FaceRecognizer
 
                     blue = (blue > 255 ? 255 : (blue < 0 ? 0 : blue));
                     green = (green > 255 ? 255 : (green < 0 ? 0 : green));
-                    red = (red > 255 ? 255 : (red < 0 ? 0 : blue));
+                    red = (red > 255 ? 255 : (red < 0 ? 0 : red));
 
-
-                    resultBuffer[byteOffset] = (byte)(blue);
+                    resultBuffer[byteOffset ] = (byte)(blue);
                     resultBuffer[byteOffset + 1] = (byte)(green);
                     resultBuffer[byteOffset + 2] = (byte)(red);
                     resultBuffer[byteOffset + 3] = 255;
@@ -261,16 +240,11 @@ namespace FaceRecognizer
             Bitmap resultBitmap = new Bitmap(sourceBitmap.Width, sourceBitmap.Height);
 
 
-            BitmapData resultData = resultBitmap.LockBits(new Rectangle(0, 0,
-                                     resultBitmap.Width, resultBitmap.Height),
-                                                      ImageLockMode.WriteOnly,
-                                                 PixelFormat.Format32bppArgb);
-
+            BitmapData resultData = resultBitmap.LockBits(new Rectangle(0, 0, resultBitmap.Width, resultBitmap.Height),
+                                                      ImageLockMode.WriteOnly,PixelFormat.Format32bppArgb);
 
             Marshal.Copy(resultBuffer, 0, resultData.Scan0, resultBuffer.Length);
             resultBitmap.UnlockBits(resultData);
-
-
             return resultBitmap;
         }
 
@@ -283,29 +257,20 @@ namespace FaceRecognizer
             int kernelRadius = length / 2;
             double distance = 0;
 
+            
+            double calculatedEuler = 1.0 / ( Math.Sqrt(2.0 * Math.PI) * weight);
 
-            double calculatedEuler = 1.0 /
-            (2.0 * Math.PI * Math.Pow(weight, 2));
 
-
-            for (int filterY = -kernelRadius;
-                 filterY <= kernelRadius; filterY++)
+            for (int filterY = -kernelRadius; filterY <= kernelRadius; filterY++)
             {
-                for (int filterX = -kernelRadius;
-                    filterX <= kernelRadius; filterX++)
+                for (int filterX = -kernelRadius; filterX <= kernelRadius; filterX++)
                 {
-                    distance = ((filterX * filterX) +
-                               (filterY * filterY)) /
+                    distance = ((filterX * filterX) + (filterY * filterY)) /
                                (2 * (weight * weight));
 
-
-                    Kernel[filterY + kernelRadius,
-                           filterX + kernelRadius] =
-                           calculatedEuler * Math.Exp(-distance);
-
-
-                    sumTotal += Kernel[filterY + kernelRadius,
-                                       filterX + kernelRadius];
+                    distance = Math.Pow(filterX - filterY, 2) / (2 * Math.Pow(weight, 2));
+                    Kernel[filterY + kernelRadius, filterX + kernelRadius] = calculatedEuler * Math.Exp(-distance);
+                    sumTotal += Kernel[filterY + kernelRadius, filterX + kernelRadius];
                 }
             }
 
@@ -314,8 +279,7 @@ namespace FaceRecognizer
             {
                 for (int x = 0; x < length; x++)
                 {
-                    Kernel[y, x] = Kernel[y, x] *
-                                   (1.0 / sumTotal);
+                    Kernel[y, x] = Kernel[y, x] * (1.0 / sumTotal);
                 }
             }
 
