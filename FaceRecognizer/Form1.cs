@@ -69,7 +69,7 @@ namespace FaceRecognizer
 
         private void button3_Click(object sender, EventArgs e)
         {
-            if (_sourceImage == null)
+            if (pictureBox1.Image == null)
             {
                 MessageBox.Show("Source image is not set!");
                 return;
@@ -77,15 +77,15 @@ namespace FaceRecognizer
 
             if (radioButton1.Checked)
             {
-                pictureBox2.Image = new Median(Convert.ToInt32(textBox1.Text)).filter(_sourceImage);
+                pictureBox2.Image = new Median(Convert.ToInt32(textBox1.Text)).filter(new Bitmap(pictureBox1.Image));
             }
             else if (radioButton2.Checked)
             {
-                pictureBox2.Image = new Gaussian(Convert.ToInt32(textBox1.Text), Convert.ToDouble(textBox2.Text)).filter(_sourceImage);
+                pictureBox2.Image = new Gaussian(Convert.ToInt32(textBox1.Text), Convert.ToDouble(textBox2.Text)).filter(new Bitmap(pictureBox1.Image));
             }
             else if (radioButton3.Checked)
             {
-                pictureBox2.Image = new Roberts().filter(_sourceImage);
+                pictureBox2.Image = new Roberts().filter(new Bitmap(pictureBox1.Image));
             }
         }
 

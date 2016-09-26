@@ -54,28 +54,29 @@ namespace FaceRecognizer
     public class Roberts : AFilter {
 
         public override Bitmap filter(Bitmap _sourceImage) {
-             var newImage = new Bitmap(_sourceImage);
+
+            var newImage = new Bitmap(_sourceImage);
             for (int i = 0; i < _sourceImage.Width; i++)
             {
                 for (int j = 0; j < _sourceImage.Height; j++)
                 {
-                    int output;
-                    if ((i == _sourceImage.Width - 1) || (j == _sourceImage.Height - 1))
-                    {
-                        output = 255-GetPixel(newImage, i, j);
-                    }
-                    else
-                    {
-                        int newX = (255-GetPixel(newImage, i + 1, j + 1)) - (255-GetPixel(newImage, i, j));
-                        int newY = (255-GetPixel(newImage, i + 1, j)) - (255-GetPixel(newImage, i, j + 1));
-                        
-                        output = (int)Math.Sqrt(newX * newX + newY * newY);
-                        newImage.SetPixel(i, j, Color.FromArgb(output));
-                    }
-
+                        int output;
+                        //int revertJ
+                        if ((i == _sourceImage.Width - 1) || (j == _sourceImage.Height - 1))
+                        {
+                            output = GetPixel(newImage, i, j);
+                        }
+                        else
+                        {
+                            
+                            int newX = GetPixel(newImage, i + 1, j + 1) - GetPixel(newImage, i, j);
+                            int newY = GetPixel(newImage, i + 1, j) - GetPixel(newImage, i, j + 1);
+                            output = (int)Math.Sqrt(newX * newX + newY * newY);
+                            newImage.SetPixel(i, j, Color.FromArgb(output));
+                        }
                 }
             }
-            return newImage;
+           return newImage;
         }
     }
 
@@ -256,19 +257,17 @@ namespace FaceRecognizer
 
             int kernelRadius = length / 2;
             double distance = 0;
+            double weigthSrt2 = 2 * weight * weight;
 
-            
-            double calculatedEuler = 1.0 / ( Math.Sqrt(2.0 * Math.PI) * weight);
+            double calculatedEuler = 1.0 / (Math.PI * weigthSrt2);
 
 
             for (int filterY = -kernelRadius; filterY <= kernelRadius; filterY++)
             {
                 for (int filterX = -kernelRadius; filterX <= kernelRadius; filterX++)
                 {
-                    distance = ((filterX * filterX) + (filterY * filterY)) /
-                               (2 * (weight * weight));
+                    distance = ((filterX * filterX) + (filterY * filterY)) / weigthSrt2;
 
-                    distance = Math.Pow(filterX - filterY, 2) / (2 * Math.Pow(weight, 2));
                     Kernel[filterY + kernelRadius, filterX + kernelRadius] = calculatedEuler * Math.Exp(-distance);
                     sumTotal += Kernel[filterY + kernelRadius, filterX + kernelRadius];
                 }
