@@ -15,68 +15,71 @@ namespace FaceRecognizer
 
         public abstract Bitmap filter(Bitmap _sourceImage);
 
-         public int GetPixel(Bitmap image, int x, int y)
+        public CustomColor GetPixel(Bitmap image, int x, int y)
         {
-            return image.GetPixel(x, y).ToArgb();
+            return new CustomColor(image.GetPixel(x, y));
         }
 
-         public class ColorWithGrey
-         {
-             public Color Color;
-             public int grey;
+        public class ColorWithGrey
+        {
+            public Color Color;
+            public int grey;
 
-             public ColorWithGrey(Color color)
-             {
-                 this.Color = color;
-                 var R = color.R;
-                 var G = color.G;
-                 var B = color.B;
-                 var rgb = 0.3 * R + 0.59 * G + 0.11 * B;
-                 var rgb_out = AroundPixel((int)rgb);
-                 this.grey = rgb_out;
-             }
-             private int AroundPixel(int value)
-             {
-                 if (value > 255)
-                 {
-                     return 255;
-                 }
-                 if (value < 0)
-                 {
-                     return 0;
-                 }
-                 return value;
-             }
+            public ColorWithGrey(Color color)
+            {
+                this.Color = color;
+                var R = color.R;
+                var G = color.G;
+                var B = color.B;
+                var rgb = 0.3 * R + 0.59 * G + 0.11 * B;
+                var rgb_out = AroundPixel((int)rgb);
+                this.grey = rgb_out;
+            }
+            private int AroundPixel(int value)
+            {
+                if (value > 255)
+                {
+                    return 255;
+                }
+                if (value < 0)
+                {
+                    return 0;
+                }
+                return value;
+            }
 
-         }
+        }
     }
 
-    public class Roberts : AFilter {
+    public class Roberts : AFilter
+    {
 
-        public override Bitmap filter(Bitmap _sourceImage) {
+        public override Bitmap filter(Bitmap _sourceImage)
+        {
 
             var newImage = new Bitmap(_sourceImage);
             for (int i = 0; i < _sourceImage.Width; i++)
             {
                 for (int j = 0; j < _sourceImage.Height; j++)
                 {
-                        int output;
-                        //int revertJ
-                        if ((i == _sourceImage.Width - 1) || (j == _sourceImage.Height - 1))
-                        {
-                            output = GetPixel(newImage, i, j);
-                        }
-                        else
-                        {
-                            
-                            int newX = GetPixel(newImage, i + 1, j + 1) - GetPixel(newImage, i, j);
-                            int newY = GetPixel(newImage, i + 1, j) - GetPixel(newImage, i, j + 1);
-                            output = (int)Math.Sqrt(newX * newX + newY * newY);
-                            newImage.SetPixel(i, j, Color.FromArgb(output));
-                        }
+                    CustomColor output;
+                    //int revertJ
+                    if ((i == _sourceImage.Width - 1) || (j == _sourceImage.Height - 1))
+                    {
+                        output = GetPixel(newImage, i, j);
+                    }
+                    else
+                    {
+
+                        CustomColor newX = GetPixel(newImage, i + 1, j + 1) - GetPixel(newImage, i, j);
+                        var newY = GetPixel(newImage, i + 1, j) - GetPixel(newImage, i, j + 1);
+                        output = CustomColor.Sqrt(newX * newX + newY * newY);
+                        //output = (int)Math.Sqrt(newX * newX + newY * newY);
+                        newImage.SetPixel(i, j, output.GetColor());
+                    }
                 }
             }
-           return newImage;
+            return newImage;
         }
     }
 
@@ -157,10 +160,10 @@ namespace FaceRecognizer
 
         public override Bitmap filter(Bitmap image)
         {
-            return ConvolutionFilter(image, Calculate(length,weight));
+            return ConvolutionFilter(image, Calculate(length, weight));
         }
-        
-        public static Bitmap ConvolutionFilter( Bitmap sourceBitmap,
+
+        public static Bitmap ConvolutionFilter(Bitmap sourceBitmap,
                                              double[,] filterMatrix,
                                                   double factor = 1,
                                                        int bias = 0)
@@ -210,7 +213,7 @@ namespace FaceRecognizer
                             calcOffset = byteOffset + (filterX * 4) + (filterY * sourceData.Stride);
 
                             blue += (double)(pixelBuffer[calcOffset]) *
-                                    filterMatrix[filterY + filterOffset,filterX + filterOffset];
+                                    filterMatrix[filterY + filterOffset, filterX + filterOffset];
 
                             green += (double)(pixelBuffer[calcOffset + 1]) *
                                      filterMatrix[filterY + filterOffset, filterX + filterOffset];
@@ -230,7 +233,7 @@ namespace FaceRecognizer
                     green = (green > 255 ? 255 : (green < 0 ? 0 : green));
                     red = (red > 255 ? 255 : (red < 0 ? 0 : red));
 
-                    resultBuffer[byteOffset ] = (byte)(blue);
+                    resultBuffer[byteOffset] = (byte)(blue);
                     resultBuffer[byteOffset + 1] = (byte)(green);
                     resultBuffer[byteOffset + 2] = (byte)(red);
                     resultBuffer[byteOffset + 3] = 255;
@@ -242,7 +245,7 @@ namespace FaceRecognizer
 
 
             BitmapData resultData = resultBitmap.LockBits(new Rectangle(0, 0, resultBitmap.Width, resultBitmap.Height),
-                                                      ImageLockMode.WriteOnly,PixelFormat.Format32bppArgb);
+                                                      ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
 
             Marshal.Copy(resultBuffer, 0, resultData.Scan0, resultBuffer.Length);
             resultBitmap.UnlockBits(resultData);
@@ -286,5 +289,5 @@ namespace FaceRecognizer
             return Kernel;
         }
     }
-    
+
 }
