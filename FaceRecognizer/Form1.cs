@@ -1,14 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.Drawing;
-using System.Drawing.Drawing2D;
+using System.Linq;
 
 namespace FaceRecognizer
 {
@@ -27,6 +21,7 @@ namespace FaceRecognizer
             {
                 _sourceImage = new Bitmap(path);
                 pictureBox1.Image = _sourceImage;
+                pictureBox2.Image = new Bitmap(_sourceImage.Width, _sourceImage.Height);
             }
             catch (Exception e)
             {
@@ -38,7 +33,7 @@ namespace FaceRecognizer
         private void button1_Click(object sender, EventArgs e)
         {
             OpenFileDialog ofd = new OpenFileDialog();
-            ofd.Filter = "(*.png)|*.png|(*.jpg)|*.jpg";
+            ofd.Filter = "(*.jpg)|*.jpg|(*.png)|*.png";
             ofd.InitialDirectory = @"C:\";
             ofd.RestoreDirectory = true;
             string path = string.Empty;
@@ -133,6 +128,61 @@ namespace FaceRecognizer
             pictureBox1.Image = new Bitmap(pictureBox2.Image);
         }
 
-        
+        private void button5_Click(object sender, EventArgs e)
+        {
+            //var img = new Gaussian(Convert.ToInt32(textBox1.Text), Convert.ToDouble(textBox2.Text)).filter(new Bitmap(pictureBox1.Image));
+            //var img = new Median(Convert.ToInt32(textBox1.Text)).filter(new Bitmap(pictureBox1.Image));
+            //img = new Roberts().filter(img);
+             var img = new Gaussian(11, 5).filter(new Bitmap(pictureBox1.Image));
+            img = new Median(5).filter(img);
+           // var img = new Bitmap(pictureBox1.Image);
+            var image = new CustomImage(img);
+            //var image = new CustomImage(new Bitmap(pictureBox1.Image));
+         
+
+
+            Window.WindowXstep= image.Width / 100;
+            Window.WindowYstep = image.Height / 100;
+            Window.WindowHeight = image.Height / 25;
+            Window.WindowWidth = image.Width / 25;
+            OpenFileDialog ofd = new OpenFileDialog();
+            if (ofd.ShowDialog() == DialogResult.OK)
+            {                
+                var classifier = Classifier.LoadFromFile(ofd.FileName);
+                var detector = new Detector(image, classifier);
+                var r = new List<Rectangle>();
+                foreach (var item in detector.Detect())
+                {
+                    if (item.Width > 5 && item.Height > 5)
+                    {
+                        r.Add(item.ToRectangle());
+                    }
+                }
+                if (r.Count() == 0)
+                {
+                    MessageBox.Show("Couldn't find face!");                    
+                }
+                else
+                {
+                    var normalImage = new Bitmap(pictureBox1.Image);
+                    var g = Graphics.FromImage(normalImage);
+                    var p = new Pen(Color.Red);
+                    foreach (var rect in r)
+                        g.DrawRectangle(p, rect);
+                    pictureBox2.Image = normalImage;
+                    //image.DrawRectangle(r.Where(x => (x.Width + x.Height) == r.Max(y => y.Width + y.Height)).ToList()[0]);
+                    //foreach (var item in r)
+                    //{
+                    //    image.DrawRectangle(item);
+                    //}     
+                }
+                
+            }
+        }
+
+        private void button6_Click(object sender, EventArgs e)
+        {
+            pictureBox2.Image = HarrisDetector.GetMarks(pictureBox1.Image);
+        }
     }
 }

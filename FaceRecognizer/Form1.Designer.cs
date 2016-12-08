@@ -44,6 +44,8 @@
             this.panel2 = new System.Windows.Forms.Panel();
             this.textBox2 = new System.Windows.Forms.TextBox();
             this.label2 = new System.Windows.Forms.Label();
+            this.button5 = new System.Windows.Forms.Button();
+            this.button6 = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).BeginInit();
             this.groupBox1.SuspendLayout();
@@ -141,7 +143,6 @@
             this.textBox1.Size = new System.Drawing.Size(76, 20);
             this.textBox1.TabIndex = 8;
             this.textBox1.Text = "5";
-            this.textBox1.Visible = false;
             // 
             // label1
             // 
@@ -214,11 +215,33 @@
             this.label2.Text = "Weight:";
             this.label2.Visible = false;
             // 
+            // button5
+            // 
+            this.button5.Location = new System.Drawing.Point(802, 294);
+            this.button5.Name = "button5";
+            this.button5.Size = new System.Drawing.Size(56, 47);
+            this.button5.TabIndex = 16;
+            this.button5.Text = "Find Face";
+            this.button5.UseVisualStyleBackColor = true;
+            this.button5.Click += new System.EventHandler(this.button5_Click);
+            // 
+            // button6
+            // 
+            this.button6.Location = new System.Drawing.Point(805, 363);
+            this.button6.Name = "button6";
+            this.button6.Size = new System.Drawing.Size(53, 51);
+            this.button6.TabIndex = 17;
+            this.button6.Text = "Find Corners";
+            this.button6.UseVisualStyleBackColor = true;
+            this.button6.Click += new System.EventHandler(this.button6_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1049, 445);
+            this.Controls.Add(this.button6);
+            this.Controls.Add(this.button5);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.textBox2);
             this.Controls.Add(this.panel2);
@@ -263,6 +286,8 @@
         private System.Windows.Forms.Panel panel2;
         private System.Windows.Forms.TextBox textBox2;
         private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.Button button5;
+        private System.Windows.Forms.Button button6;
     }
 }
 
